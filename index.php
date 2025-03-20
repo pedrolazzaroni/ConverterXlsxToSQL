@@ -13,22 +13,22 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --accent-color: #4cc9f0;
+            --primary-color: #ff7700;
+            --secondary-color: #212121;
+            --accent-color: #ff9d40;
             --light-color: #f8f9fa;
-            --dark-color: #212529;
+            --dark-color: #111111;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%);
             min-height: 100vh;
             font-family: 'Poppins', sans-serif;
         }
         
         .navbar {
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         
         .main-container {
@@ -66,12 +66,13 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             border-radius: 50px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 119, 0, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.5);
+            box-shadow: 0 8px 25px rgba(255, 119, 0, 0.5);
+            background: linear-gradient(90deg, #ff8800, #333333);
         }
         
         .form-control {
@@ -83,7 +84,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         .file-upload-wrapper {
             position: relative;
             margin-bottom: 15px;
-            border: 2px dashed #c3cfe2;
+            border: 2px dashed #ff9d40;
             border-radius: 15px;
             padding: 2rem;
             text-align: center;
@@ -117,6 +118,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             background-color: white;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
         }
         
         .step-card:hover {
@@ -151,8 +153,25 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             display: none;
             margin-top: 15px;
             padding: 10px;
-            background-color: rgba(67, 97, 238, 0.1);
+            background-color: rgba(255, 119, 0, 0.1);
             border-radius: 10px;
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        footer {
+            background: var(--secondary-color);
+        }
+        
+        .features-list i.text-success {
+            color: var(--primary-color) !important;
+        }
+        
+        .fas.fa-file-excel,
+        .fas.fa-lightbulb {
+            color: var(--primary-color) !important;
         }
     </style>
 </head>
@@ -161,7 +180,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
-                <i class="fas fa-exchange-alt me-2"></i>
+                <i class="fas fa-exchange-alt me-2" style="color: #ff9d40;"></i>
                 <span class="fw-bold">Conversor Excel para SQL</span>
             </a>
         </div>
@@ -263,7 +282,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         </div>
     </div>
     
-    <footer class="bg-dark text-white text-center py-4 mt-5">
+    <footer class="text-white text-center py-4 mt-5">
         <div class="container">
             <p class="mb-0">Conversor Excel para MySQL © 2023 | Uma ferramenta para facilitar a importação de dados</p>
         </div>
