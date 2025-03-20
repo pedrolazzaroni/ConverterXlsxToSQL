@@ -8,7 +8,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor Excel para MySQL</title>
+    <title>Conversor Xlsx para SQL</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -246,6 +246,9 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         </div>
     </div>
 
+    <!-- Frame oculto para download -->
+    <iframe id="downloadFrame" style="display:none;"></iframe>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
@@ -368,6 +371,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         
         // Script para exibir a tela de carregamento
         document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Impede o envio tradicional do formulário
+            
             // Verifica se um arquivo foi selecionado
             if (document.getElementById('arquivo').files.length > 0) {
                 // Mostra a tela de carregamento
@@ -376,7 +381,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 // Desabilita o botão de envio para evitar múltiplos envios
                 document.getElementById('submitButton').disabled = true;
                 
-                // Simula mensagens de progresso (opcional)
+                // Simula mensagens de progresso
                 const loadingText = document.querySelector('.loading-text');
                 const messages = [
                     "Processando seu arquivo...",
@@ -391,9 +396,92 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     loadingText.textContent = messages[messageIndex];
                 }, 3000);
                 
-                // Limpa o intervalo quando a página é descarregada ou recarregada
-                window.addEventListener('beforeunload', function() {
+                // Preparar os dados do formulário para envio via AJAX
+                const formData = new FormData(this);
+                
+                // Enviar o formulário via AJAX
+                fetch('converter.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao processar o arquivo');
+                    }
+                    
+                    // Verificar se o Content-Type é um tipo de download
+                    const contentType = response.headers.get('Content-Type');
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    
+                    if (contentType === 'application/octet-stream' || 
+                        (contentDisposition && contentDisposition.includes('attachment'))) {
+                        
+                        // É um download, obter o nome do arquivo
+                        let filename = 'arquivo.sql';
+                        if (contentDisposition) {
+                            const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                            if (filenameMatch && filenameMatch[1]) {
+                                filename = filenameMatch[1];
+                            }
+                        }
+                        
+                        // Converter a resposta para blob e criar URL
+                        return response.blob().then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            
+                            // Criar link de download e clicar automaticamente
+                            const a = document.createElement('a');
+                            a.style.display = 'none';
+                            a.href = url;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            
+                            // Ocultar a tela de carregamento antes de iniciar o download
+                            clearInterval(messageInterval);
+                            document.getElementById('loadingOverlay').style.display = 'none';
+                            
+                            // Mostrar mensagem de sucesso
+                            const alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-success';
+                            alertDiv.innerHTML = '<i class="fas fa-check-circle me-2"></i> Conversão concluída! O download está começando...';
+                            const formElement = document.getElementById('uploadForm');
+                            formElement.parentNode.insertBefore(alertDiv, formElement);
+                            
+                            // Iniciar o download
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                            
+                            // Reativar o botão de envio
+                            document.getElementById('submitButton').disabled = false;
+                            
+                            return true;
+                        });
+                    } else {
+                        // Se não for um download, é provavelmente uma mensagem de erro
+                        return response.text();
+                    }
+                })
+                .then(result => {
+                    if (result !== true) {
+                        // Se não foi um download bem-sucedido, exibir a mensagem de erro
+                        throw new Error(result || 'Erro ao processar o arquivo');
+                    }
+                })
+                .catch(error => {
+                    // Ocultar a tela de carregamento
                     clearInterval(messageInterval);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    
+                    // Mostrar mensagem de erro
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger';
+                    alertDiv.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i> ' + error.message;
+                    const formElement = document.getElementById('uploadForm');
+                    formElement.parentNode.insertBefore(alertDiv, formElement);
+                    
+                    // Reativar o botão de envio
+                    document.getElementById('submitButton').disabled = false;
                 });
             }
         });
