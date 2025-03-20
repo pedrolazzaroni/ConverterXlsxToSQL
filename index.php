@@ -21,13 +21,13 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%);
+            background-color: #f5f7fa;
             min-height: 100vh;
             font-family: 'Poppins', sans-serif;
         }
         
         .navbar {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-color: var(--secondary-color);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         
@@ -50,7 +50,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         }
         
         .card-header {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-color: var(--primary-color);
             padding: 1.5rem;
             border-bottom: none;
         }
@@ -60,7 +60,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         }
         
         .btn-primary {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-color: var(--primary-color);
             border: none;
             padding: 0.8rem 2rem;
             border-radius: 50px;
@@ -72,7 +72,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255, 119, 0, 0.5);
-            background: linear-gradient(90deg, #ff8800, #333333);
+            background-color: #ff8800;
         }
         
         .form-control {
@@ -132,7 +132,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             justify-content: center;
             width: 40px;
             height: 40px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-color: var(--primary-color);
             color: white;
             border-radius: 50%;
             font-weight: bold;
@@ -173,9 +173,79 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         .fas.fa-lightbulb {
             color: var(--primary-color) !important;
         }
+        
+        /* Estilos da tela de carregamento */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .loading-progress {
+            width: 300px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            width: 0%;
+            animation: progress 2s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
     </style>
 </head>
 <body>
+    <!-- Tela de Carregamento -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Processando seu arquivo...</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
@@ -244,7 +314,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                             </div>
                         <?php endif; ?>
                         
-                        <form action="converter.php" method="post" enctype="multipart/form-data">
+                        <form action="converter.php" method="post" enctype="multipart/form-data" id="uploadForm">
                             <div class="file-upload-wrapper mb-4">
                                 <input type="file" class="file-upload-input" id="arquivo" name="arquivo" accept=".xlsx" required>
                                 <div class="text-center">
@@ -259,7 +329,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                             </div>
                             
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" id="submitButton">
                                     <i class="fas fa-exchange-alt me-2"></i>Converter para SQL
                                 </button>
                             </div>
@@ -294,6 +364,38 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             const fileName = e.target.files[0]?.name || 'Nenhum arquivo selecionado';
             document.getElementById('file-name').textContent = fileName;
             document.getElementById('selected-file-info').style.display = 'block';
+        });
+        
+        // Script para exibir a tela de carregamento
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            // Verifica se um arquivo foi selecionado
+            if (document.getElementById('arquivo').files.length > 0) {
+                // Mostra a tela de carregamento
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                
+                // Desabilita o botão de envio para evitar múltiplos envios
+                document.getElementById('submitButton').disabled = true;
+                
+                // Simula mensagens de progresso (opcional)
+                const loadingText = document.querySelector('.loading-text');
+                const messages = [
+                    "Processando seu arquivo...",
+                    "Analisando conteúdo da planilha...",
+                    "Convertendo dados para SQL...",
+                    "Finalizando o processamento..."
+                ];
+                
+                let messageIndex = 0;
+                const messageInterval = setInterval(function() {
+                    messageIndex = (messageIndex + 1) % messages.length;
+                    loadingText.textContent = messages[messageIndex];
+                }, 3000);
+                
+                // Limpa o intervalo quando a página é descarregada ou recarregada
+                window.addEventListener('beforeunload', function() {
+                    clearInterval(messageInterval);
+                });
+            }
         });
     </script>
 </body>
