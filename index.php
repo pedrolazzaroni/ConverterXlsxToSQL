@@ -51,6 +51,47 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             top: 0;
             z-index: 1000;
             border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        /* Nova classe para o efeito de blur no header ao rolar */
+        header.scrolled {
+            background-color: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Botão de menu mobile e sua animação */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 24px;
+            width: 30px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .mobile-menu-toggle span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: var(--text-color);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: translateY(10px) rotate(45deg);
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg);
         }
         
         .header-content {
@@ -576,6 +617,61 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         
         /* Ajuste responsivo para os links do menu */
         @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                max-width: 300px;
+                height: 100vh;
+                background-color: var(--secondary-color);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                transition: right 0.3s ease;
+                z-index: 1000;
+                padding: 2rem;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            }
+            
+            .nav-links.active {
+                right: 0;
+            }
+            
+            .nav-link {
+                font-size: 1.2rem;
+                padding: 1rem 0;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .nav-link::after {
+                bottom: -5px;
+                height: 3px;
+            }
+            
+            /* Overlay escuro quando o menu está aberto */
+            .menu-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+                backdrop-filter: blur(3px);
+            }
+            
+            .menu-overlay.active {
+                display: block;
+            }
+            
             .nav-links {
                 gap: 10px;
                 font-size: 0.9rem;
@@ -640,6 +736,9 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
     </div>
 
     <div class="page-container">
+        <!-- Menu Overlay para versão mobile -->
+        <div class="menu-overlay" id="menuOverlay"></div>
+        
         <!-- Tela de Carregamento para o processamento -->
         <div class="loading-overlay" id="loadingOverlay">
             <div class="loading-spinner"></div>
@@ -650,16 +749,23 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         </div>
 
         <!-- Header com atalhos -->
-        <header>
+        <header id="mainHeader">
             <div class="container">
                 <div class="header-content">
                     <a href="#top" class="logo">
                         <i class="fas fa-exchange-alt"></i>
-                        <span>Excel para SQL</span>
+                        <span style="font-style: italic;">ExcelToSQL</span>
                     </a>
                     
+                    <!-- Botão do menu mobile -->
+                    <div class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    
                     <!-- Atalhos de navegação -->
-                    <div class="nav-links">
+                    <div class="nav-links" id="navLinks">
                         <a href="#top" class="nav-link">Início</a>
                         <a href="#how-it-works" class="nav-link">Como Funciona</a>
                         <a href="#features" class="nav-link">Recursos</a>
@@ -974,6 +1080,50 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     document.getElementById('submitButton').disabled = false;
                 });
             }
+        });
+        
+        // Código para o efeito de blur no header ao rolar
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('mainHeader');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+        
+        // Código para o menu mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const navLinks = document.getElementById('navLinks');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const navLinksItems = document.querySelectorAll('.nav-link');
+            
+            // Função para abrir/fechar o menu
+            function toggleMenu() {
+                mobileMenuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+                document.body.classList.toggle('no-scroll');
+            }
+            
+            // Toggle no clique do botão
+            mobileMenuToggle.addEventListener('click', toggleMenu);
+            
+            // Fechar menu ao clicar no overlay
+            menuOverlay.addEventListener('click', toggleMenu);
+            
+            // Fechar menu ao clicar em um link
+            navLinksItems.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (navLinks.classList.contains('active')) {
+                        toggleMenu();
+                    }
+                });
+            });
+            
+            // Código existente para o efeito de carregamento da página
+            // ...existing code...
         });
     </script>
 </body>

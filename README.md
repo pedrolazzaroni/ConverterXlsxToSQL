@@ -1,6 +1,6 @@
-# Conversor Excel para SQL
+# ExcelToSQL
 
-Uma aplicação web para converter arquivos Excel (.xlsx) em comandos SQL prontos para importação em qualquer banco de dados MySQL. O sistema detecta automaticamente os cabeçalhos do arquivo Excel e gera scripts SQL otimizados.
+Uma aplicação web moderna para converter arquivos Excel (.xlsx) em comandos SQL prontos para importação em qualquer banco de dados MySQL. O sistema detecta automaticamente os cabeçalhos do arquivo Excel e gera scripts SQL otimizados com interface intuitiva e responsiva.
 
 ## Características
 
@@ -8,9 +8,22 @@ Uma aplicação web para converter arquivos Excel (.xlsx) em comandos SQL pronto
 - ✅ Detecção automática dos cabeçalhos das colunas
 - ✅ Suporte completo a caracteres especiais e acentos (UTF-8)
 - ✅ Download automático do arquivo SQL gerado
-- ✅ Interface moderna e responsiva
+- ✅ Interface moderna com tema escuro e animações
 - ✅ Feedback visual durante o processamento
+- ✅ Carregamento progressivo e animado das páginas
+- ✅ Navegação suave entre seções da página
+- ✅ Design responsivo para todos os dispositivos
+- ✅ Upload por arrastar e soltar ou seleção direta
 - ✅ Não requer configuração de banco de dados
+
+## Interface e Experiência do Usuário
+
+- 🎨 Tema escuro moderno para redução de fadiga visual
+- 🔄 Animações de transição e carregamento
+- 📱 Layout totalmente responsivo (desktop, tablet, mobile)
+- 🖱️ Navegação intuitiva com rolagem suave
+- 📋 Feedback em tempo real durante processamento
+- 💾 Download automático após conversão
 
 ## Requisitos
 
@@ -49,13 +62,15 @@ Uma aplicação web para converter arquivos Excel (.xlsx) em comandos SQL pronto
 
 3. Clique em "Converter para SQL"
 
-4. Aguarde o processamento - uma tela de carregamento será exibida
+4. Aguarde o processamento - uma tela de carregamento com feedback visual será exibida
 
 5. O download do arquivo SQL iniciará automaticamente quando o processamento for concluído
 
 6. Importe o arquivo SQL gerado em seu sistema de gerenciamento de banco de dados MySQL
 
-## Estrutura do arquivo SQL gerado
+## Funcionalidades Técnicas
+
+### Estrutura do arquivo SQL gerado
 
 O arquivo SQL gerado contém:
 
@@ -80,6 +95,13 @@ O arquivo SQL gerado contém:
    INSERT INTO `nome_da_tabela` (`coluna1`, `coluna2`, ...) VALUES ('valor1', 'valor2', ...);
    ```
 
+## Tecnologias Utilizadas
+
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
+- **Backend**: PHP
+- **Dependências**: PhpSpreadsheet (processamento de arquivos Excel)
+- **Ícones**: Font Awesome, Bootstrap Icons
+
 ## Dicas de uso
 
 - Certifique-se de que a primeira linha do seu arquivo Excel contém os nomes das colunas
@@ -93,6 +115,7 @@ O arquivo SQL gerado contém:
 - **Erro "Arquivo muito grande"**: Aumente os limites de upload em seu php.ini (`upload_max_filesize` e `post_max_size`)
 - **Tempo limite excedido**: Aumente o `max_execution_time` no php.ini
 - **Caracteres incorretos**: Verifique se seu sistema está configurado para UTF-8
+- **Problemas de visualização**: Certifique-se de usar um navegador atualizado (Chrome, Firefox, Edge, Safari)
 
 ## Licença
 
