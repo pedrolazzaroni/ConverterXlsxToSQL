@@ -104,7 +104,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--text-color);
-            /* Removido o gradiente, substituído por cor sólida */
         }
         
         .hero-description {
@@ -403,6 +402,116 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             animation: progress 2s ease-in-out infinite;
         }
         
+        /* Estilos para os atalhos no header */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Efeito de carregamento da página */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--secondary-color);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .loader-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .loader-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite alternate;
+        }
+        
+        .loader-text {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            text-align: center;
+            max-width: 400px;
+            opacity: 0;
+            animation: fadeIn 0.8s forwards 0.5s;
+        }
+        
+        .loader-progress {
+            width: 300px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: var(--primary-color);
+            animation: loadProgress 2.5s ease forwards;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes loadProgress {
+            0% { width: 0; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        /* Para rolagem suave */
+        html {
+            scroll-behavior: smooth;
+        }
+        
         footer {
             background-color: var(--secondary-color);
             color: white;
@@ -465,17 +574,13 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             color: rgba(255, 255, 255, 0.6);
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes progress {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
+        /* Ajuste responsivo para os links do menu */
         @media (max-width: 768px) {
+            .nav-links {
+                gap: 10px;
+                font-size: 0.9rem;
+            }
+            
             .hero-title {
                 font-size: 2rem;
             }
@@ -508,11 +613,34 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 margin-right: auto;
             }
         }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes progress {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
     </style>
 </head>
 <body>
+    <!-- Efeito de carregamento da página -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-icon">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <div class="loader-text">Preparando seu conversor Excel para SQL...</div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="page-container">
-        <!-- Tela de Carregamento -->
+        <!-- Tela de Carregamento para o processamento -->
         <div class="loading-overlay" id="loadingOverlay">
             <div class="loading-spinner"></div>
             <div class="loading-text">Processando seu arquivo...</div>
@@ -521,23 +649,30 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             </div>
         </div>
 
-        <!-- Header -->
+        <!-- Header com atalhos -->
         <header>
             <div class="container">
                 <div class="header-content">
-                    <a href="#" class="logo">
+                    <a href="#top" class="logo">
                         <i class="fas fa-exchange-alt"></i>
                         <span>Excel para SQL</span>
                     </a>
+                    
+                    <!-- Atalhos de navegação -->
+                    <div class="nav-links">
+                        <a href="#top" class="nav-link">Início</a>
+                        <a href="#how-it-works" class="nav-link">Como Funciona</a>
+                        <a href="#features" class="nav-link">Recursos</a>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main>
+        <main id="top">
             <div class="container">
                 <!-- Hero Section e Upload juntos - Ajustado para 20px do topo -->
-                <div class="row align-items-center" >
+                <div class="row align-items-center" style="margin-top: 20px;">
                     <!-- Hero Section (lado esquerdo) -->
                     <div class="col-lg-6 hero-section pe-lg-5">
                         <h1 class="hero-title">Converta Excel para SQL em segundos</h1>
@@ -570,7 +705,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                                             <i class="fas fa-file-excel"></i>
                                         </div>
                                         <h4 class="mb-2">Arraste e solte seu arquivo Excel aqui</h4>
-                                        <p class="text-muted">Ou clique para selecionar</p>
+                                        <p>Ou clique para selecionar</p>
                                         <div class="selected-file" id="selected-file-info">
                                             <i class="fas fa-file-alt me-2"></i>
                                             <span id="file-name">Nenhum arquivo selecionado</span>
@@ -597,7 +732,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 </div>
 
                 <!-- How It Works Section -->
-                <section class="section" style="margin-top: 20px;">
+                <section id="how-it-works" class="section" style="margin-top: 20px;">
                     <h2 class="section-title"><i class="fas fa-info-circle"></i> Como Funciona</h2>
                     
                     <div class="steps-container">
@@ -626,7 +761,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 </section>
 
                 <!-- Features Section -->
-                <section class="section">
+                <section id="features" class="section">
                     <h2 class="section-title"><i class="fas fa-star"></i> Recursos</h2>
                     
                     <div class="features-grid">
@@ -688,6 +823,10 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                         <a href="mailto:contato@pedrolazzaroni.com.br" class="social-link">
                             <i class="bi bi-envelope"></i>
                         </a>
+                        <!-- Novo ícone para acessar o portfólio -->
+                        <a href="https://pedrolazzaroni.com.br" class="social-link" target="_blank">
+                            <i class="bi bi-person-workspace"></i>
+                        </a>
                     </div>
                 </div>
                 
@@ -700,6 +839,20 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Código para o efeito de carregamento da página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulação de carregamento da página
+            setTimeout(function() {
+                const pageLoader = document.getElementById('pageLoader');
+                pageLoader.style.opacity = '0';
+                pageLoader.style.visibility = 'hidden';
+                
+                // Revelar o conteúdo com uma ligeira animação
+                document.body.style.animation = 'fadeIn 0.5s ease forwards';
+            }, 2700); // Tempo total para o efeito de carregamento (um pouco mais que a animação da barra de progresso)
+        });
+        
+        // Código para o file uploader e tela de carregamento de processamento
         document.getElementById('arquivo').addEventListener('change', function(e) {
             const fileName = e.target.files[0]?.name || 'Nenhum arquivo selecionado';
             document.getElementById('file-name').textContent = fileName;
