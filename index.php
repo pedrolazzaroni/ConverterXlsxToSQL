@@ -354,7 +354,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
     
     <footer class="text-white text-center py-4 mt-5">
         <div class="container">
-            <p class="mb-0">Conversor Excel para MySQL © 2023 | Uma ferramenta para facilitar a importação de dados</p>
+            <p class="mb-0">Conversor Excel para MySQL - Pedro Lazzaroni © <?php echo date('Y') ?> | Uma ferramenta para facilitar a importação de dados</p>
         </div>
     </footer>
 
