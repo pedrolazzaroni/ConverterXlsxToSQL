@@ -20,91 +20,116 @@ if ($extensao !== 'xlsx') {
 
 // Carrega o autoloader do Composer
 require 'vendor/autoload.php';
-require 'config.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 try {
-    // Conecta ao banco de dados
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
-    
-    // Verifica a conexão
-    if ($conn->connect_error) {
-        throw new Exception("Falha na conexão: " . $conn->connect_error);
-    }
-    
-    // Cria o banco de dados se não existir
-    $conn->query("CREATE DATABASE IF NOT EXISTS " . DB_NAME);
-    $conn->select_db(DB_NAME);
-    
-    // Carrega o script SQL para criar a tabela
-    $sqlScript = file_get_contents('create_table.sql');
-    if (!$conn->multi_query($sqlScript)) {
-        throw new Exception("Erro ao criar tabela: " . $conn->error);
-    }
-    
-    // Espera até que todas as queries sejam executadas
-    while ($conn->more_results() && $conn->next_result());
+    // Obtém o nome do arquivo sem extensão para usar como nome da tabela
+    $nomeArquivo = pathinfo($_FILES['arquivo']['name'], PATHINFO_FILENAME);
+    // Limpa o nome da tabela (remove espaços e caracteres especiais)
+    $nomeTabela = preg_replace('/[^a-zA-Z0-9_]/', '_', $nomeArquivo);
+    $nomeTabela = strtolower($nomeTabela);
     
     // Carrega o arquivo Excel
     $spreadsheet = IOFactory::load($_FILES['arquivo']['tmp_name']);
     $worksheet = $spreadsheet->getActiveSheet();
     $rows = $worksheet->toArray();
     
-    // Remove o cabeçalho (primeira linha)
-    $headers = array_shift($rows);
-    
-    // Prepara a query de inserção
-    $stmt = $conn->prepare("INSERT INTO bps_medicamentos 
-        (municipio_instituicao, uf, compra, codigo_br, descricao_catmat, 
-        unidade_fornecimento, generico, cnpj_fornecedor, fornecedor, 
-        qtd_itens_comprados, preco_unitario, preco_total) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    
-    if (!$stmt) {
-        throw new Exception("Erro na preparação da query: " . $conn->error);
+    // Verifica se há pelo menos uma linha (cabeçalho)
+    if (count($rows) < 1) {
+        throw new Exception("O arquivo Excel está vazio.");
     }
     
-    $stmt->bind_param(
-        "sssssssssddd", 
-        $municipio_instituicao, $uf, $compra, $codigo_br, $descricao_catmat,
-        $unidade_fornecimento, $generico, $cnpj_fornecedor, $fornecedor,
-        $qtd_itens_comprados, $preco_unitario, $preco_total
-    );
+    // Pega a primeira linha como cabeçalho
+    $headers = array_shift($rows);
     
-    // Contador de registros inseridos
-    $contador = 0;
+    // Limpa os cabeçalhos (remove espaços e caracteres especiais)
+    $headers = array_map(function($header) {
+        return preg_replace('/[^a-zA-Z0-9_]/', '_', trim($header));
+    }, $headers);
     
-    // Insere os dados
-    foreach ($rows as $row) {
-        if (count($row) >= 12) { // Verifica se a linha tem todos os campos necessários
-            $municipio_instituicao = $row[0];
-            $uf = $row[1];
-            $compra = $row[2];
-            $codigo_br = $row[3];
-            $descricao_catmat = $row[4];
-            $unidade_fornecimento = $row[5];
-            $generico = $row[6];
-            $cnpj_fornecedor = $row[7];
-            $fornecedor = $row[8];
-            $qtd_itens_comprados = (int)$row[9];
-            $preco_unitario = (float)str_replace(',', '.', $row[10]);
-            $preco_total = (float)str_replace(',', '.', $row[11]);
-            
-            if ($stmt->execute()) {
-                $contador++;
-            }
+    // Verifica se há cabeçalhos válidos
+    $headers = array_filter($headers, function($header) {
+        return !empty($header);
+    });
+    
+    if (count($headers) < 1) {
+        throw new Exception("Não foram encontrados cabeçalhos válidos na primeira linha do Excel.");
+    }
+    
+    // Cria o arquivo SQL
+    $sqlFile = 'sql_' . time() . '.sql';
+    $sqlFilePath = __DIR__ . '/' . $sqlFile;
+    $sqlContent = '';
+    
+    // Adiciona comentário inicial
+    $sqlContent .= "-- SQL gerado a partir do arquivo: " . $_FILES['arquivo']['name'] . "\n";
+    $sqlContent .= "-- Data de geração: " . date('Y-m-d H:i:s') . "\n\n";
+    
+    // Cria o script para criar a tabela
+    $sqlContent .= "CREATE TABLE IF NOT EXISTS `$nomeTabela` (\n";
+    $sqlContent .= "    `id` INT AUTO_INCREMENT PRIMARY KEY,\n";
+    
+    foreach ($headers as $header) {
+        if (!empty($header)) {
+            $sqlContent .= "    `$header` TEXT,\n";
         }
     }
     
-    $stmt->close();
-    $conn->close();
+    $sqlContent .= "    `data_importacao` TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n";
+    $sqlContent .= ");\n\n";
     
-    // Redireciona com mensagem de sucesso
-    header("Location: index.php?success=Conversão concluída! $contador registros inseridos com sucesso.");
+    // Cria os INSERTs
+    foreach ($rows as $row) {
+        // Verifica se a linha tem dados
+        $rowData = array_slice($row, 0, count($headers));
+        if (array_filter($rowData, function($cell) { return !empty($cell); })) {
+            $sqlContent .= "INSERT INTO `$nomeTabela` (";
+            
+            // Adiciona os nomes das colunas
+            $sqlContent .= "`" . implode("`, `", $headers) . "`";
+            
+            $sqlContent .= ") VALUES (";
+            
+            // Adiciona os valores
+            $values = [];
+            foreach ($rowData as $cell) {
+                if ($cell === null || $cell === '') {
+                    $values[] = "NULL";
+                } else {
+                    // Escapa aspas simples
+                    $cell = str_replace("'", "''", $cell);
+                    $values[] = "'$cell'";
+                }
+            }
+            
+            $sqlContent .= implode(", ", $values);
+            $sqlContent .= ");\n";
+        }
+    }
+    
+    // Salva o arquivo SQL
+    if (file_put_contents($sqlFilePath, $sqlContent) === false) {
+        throw new Exception("Não foi possível salvar o arquivo SQL.");
+    }
+    
+    // Define headers para download do arquivo
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename="' . $sqlFile . '"');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($sqlFilePath));
+    readfile($sqlFilePath);
+    
+    // Remove o arquivo após o download
+    unlink($sqlFilePath);
+    exit;
     
 } catch (Exception $e) {
     // Redireciona com mensagem de erro
     header("Location: index.php?error=" . urlencode($e->getMessage()));
+    exit;
 }
 ?>
