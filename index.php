@@ -84,9 +84,9 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         }
         
         .hero-section {
-            padding: 3rem 0;
-            margin-bottom: 2rem;
+            padding: 2rem 0;
             position: relative;
+            border-top: none;
         }
         
         .hero-section::before {
@@ -96,7 +96,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at top right, rgba(255, 119, 0, 0.1), transparent 60%);
             z-index: -1;
         }
         
@@ -104,9 +103,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            background: linear-gradient(90deg, var(--text-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-color);
+            /* Removido o gradiente, substituído por cor sólida */
         }
         
         .hero-description {
@@ -136,11 +134,14 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         .upload-container {
             background-color: var(--section-bg);
             border-radius: 16px;
-            padding: 2.5rem;
-            margin-bottom: 2rem;
+            padding: 2rem;
             border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
+            height: 100%;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
         }
         
         .upload-container::before {
@@ -494,6 +495,19 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 gap: 1.5rem;
             }
         }
+        
+        @media (max-width: 991px) {
+            .hero-section {
+                padding: 2rem 0;
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+            
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -522,67 +536,68 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         <!-- Main Content -->
         <main>
             <div class="container">
-                <!-- Hero Section -->
-                <section class="hero-section">
-                    <h1 class="hero-title">Converta Excel para SQL em segundos</h1>
-                    <p class="hero-description">
-                        Transforme suas planilhas Excel em comandos SQL prontos para importação em bancos de dados MySQL. 
-                        Sem complicações, sem configurações. Apenas escolha seu arquivo e pronto!
-                    </p>
-                </section>
-
-                <!-- Upload Section -->
-                <section class="section">
-                    <h2 class="section-title"><i class="fas fa-file-upload"></i> Carregar Arquivo</h2>
+                <!-- Hero Section e Upload juntos - Ajustado para 20px do topo -->
+                <div class="row align-items-center" >
+                    <!-- Hero Section (lado esquerdo) -->
+                    <div class="col-lg-6 hero-section pe-lg-5">
+                        <h1 class="hero-title">Converta Excel para SQL em segundos</h1>
+                        <p class="hero-description">
+                            Transforme suas planilhas Excel em comandos SQL prontos para importação em bancos de dados MySQL. 
+                            Sem complicações, sem configurações. Apenas escolha seu arquivo e pronto!
+                        </p>
+                    </div>
                     
-                    <div class="upload-container">
-                        <?php if($success): ?>
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle me-2"></i> <?php echo $success; ?>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <?php if($error): ?>
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle me-2"></i> <?php echo $error; ?>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <form action="converter.php" method="post" enctype="multipart/form-data" id="uploadForm">
-                            <div class="file-upload-wrapper position-relative">
-                                <input type="file" class="file-upload-input" id="arquivo" name="arquivo" accept=".xlsx" required>
-                                <div class="text-center">
-                                    <div class="file-icon">
-                                        <i class="fas fa-file-excel"></i>
-                                    </div>
-                                    <h4 class="mb-2">Arraste e solte seu arquivo Excel aqui</h4>
-                                    <p class="text-muted">Ou clique para selecionar</p>
-                                    <div class="selected-file" id="selected-file-info">
-                                        <i class="fas fa-file-alt me-2"></i>
-                                        <span id="file-name">Nenhum arquivo selecionado</span>
+                    <!-- Upload Section (lado direito) -->
+                    <div class="col-lg-6">
+                        <div class="upload-container">
+                            <?php if($success): ?>
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i> <?php echo $success; ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <?php if($error): ?>
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i> <?php echo $error; ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <form action="converter.php" method="post" enctype="multipart/form-data" id="uploadForm">
+                                <div class="file-upload-wrapper position-relative">
+                                    <input type="file" class="file-upload-input" id="arquivo" name="arquivo" accept=".xlsx" required>
+                                    <div class="text-center">
+                                        <div class="file-icon">
+                                            <i class="fas fa-file-excel"></i>
+                                        </div>
+                                        <h4 class="mb-2">Arraste e solte seu arquivo Excel aqui</h4>
+                                        <p class="text-muted">Ou clique para selecionar</p>
+                                        <div class="selected-file" id="selected-file-info">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            <span id="file-name">Nenhum arquivo selecionado</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                
+                                <button type="submit" class="btn btn-convert" id="submitButton">
+                                    <i class="fas fa-exchange-alt"></i>Converter para SQL
+                                </button>
+                            </form>
                             
-                            <button type="submit" class="btn btn-convert" id="submitButton">
-                                <i class="fas fa-exchange-alt"></i>Converter para SQL
-                            </button>
-                        </form>
-                        
-                        <div class="alert alert-info mt-4">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-lightbulb me-3" style="font-size: 1.5rem;"></i>
-                                <div>
-                                    <h5 class="m-0">Dica importante</h5>
-                                    <p class="mb-0 mt-1">Certifique-se de que sua planilha tenha a primeira linha como cabeçalho contendo os nomes das colunas.</p>
+                            <div class="alert alert-info mt-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-lightbulb me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h5 class="m-0">Dica importante</h5>
+                                        <p class="mb-0 mt-1">Certifique-se de que sua planilha tenha a primeira linha como cabeçalho contendo os nomes das colunas.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
 
                 <!-- How It Works Section -->
-                <section class="section">
+                <section class="section" style="margin-top: 20px;">
                     <h2 class="section-title"><i class="fas fa-info-circle"></i> Como Funciona</h2>
                     
                     <div class="steps-container">
@@ -622,13 +637,16 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                             <h3 class="feature-title">Conversão rápida</h3>
                             <p class="feature-desc">Transforme suas planilhas em segundos, sem esperas desnecessárias.</p>
                         </div>
+                        
+                        <!-- Novo recurso sobre facilidade de uso -->
                         <div class="feature-card">
                             <div class="feature-icon">
-                                <i class="fas fa-layer-group"></i>
+                                <i class="fas fa-magic"></i>
                             </div>
-                            <h3 class="feature-title">Múltiplas abas</h3>
-                            <p class="feature-desc">Processa todas as abas do seu arquivo Excel automaticamente.</p>
+                            <h3 class="feature-title">Sem complicações</h3>
+                            <p class="feature-desc">Interface intuitiva que não requer conhecimentos técnicos. Apenas arraste, solte e pronto!</p>
                         </div>
+                        
                         <div class="feature-card">
                             <div class="feature-icon">
                                 <i class="fas fa-language"></i>
