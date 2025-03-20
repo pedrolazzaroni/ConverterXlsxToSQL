@@ -404,7 +404,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             align-items: center;
             z-index: 9999;
             display: none;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         
         .loading-spinner {
@@ -438,9 +439,14 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             height: 100%;
             background-color: var(--primary-color);
             border-radius: 4px;
-            width: 0%;
+            width: 100%;
             position: absolute;
-            animation: progress 2s ease-in-out infinite;
+            animation: progress-animation 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes progress-animation {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         
         /* Estilos para os atalhos no header */
@@ -972,13 +978,20 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             // Verifica se um arquivo foi selecionado
             if (document.getElementById('arquivo').files.length > 0) {
                 // Mostra a tela de carregamento
-                document.getElementById('loadingOverlay').style.display = 'flex';
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.display = 'flex';
+                
+                // Reinicia a animação da barra de progresso
+                const progressBar = loadingOverlay.querySelector('.loading-progress-bar');
+                progressBar.style.animation = 'none';
+                void progressBar.offsetWidth; // Força o reflow
+                progressBar.style.animation = 'progress-animation 1.5s ease-in-out infinite';
                 
                 // Desabilita o botão de envio para evitar múltiplos envios
                 document.getElementById('submitButton').disabled = true;
                 
                 // Simula mensagens de progresso
-                const loadingText = document.querySelector('.loading-text');
+                const loadingText = loadingOverlay.querySelector('.loading-text');
                 const messages = [
                     "Processando seu arquivo...",
                     "Analisando conteúdo da planilha...",
@@ -1121,9 +1134,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     }
                 });
             });
-            
-            // Código existente para o efeito de carregamento da página
-            // ...existing code...
         });
     </script>
 </body>
