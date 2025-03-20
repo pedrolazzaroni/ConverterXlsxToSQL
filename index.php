@@ -11,6 +11,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
     <title>Conversor Xlsx para SQL</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" href="./assets/favicon/favicon.png" type="image/x-icon">
     <style>
         :root {
             --primary-color: #ff7700;
@@ -234,6 +236,70 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             50% { width: 100%; }
             100% { width: 0%; }
         }
+        
+        /* Estilos atualizados do footer */
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .footer-logo span {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-card {
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -261,45 +327,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
     <div class="container main-container">
         <div class="row">
-            <!-- Informações do Projeto -->
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header text-white">
-                        <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>Sobre o Conversor</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <h4 class="text-primary mb-3">O que é isso?</h4>
-                            <p>Esta ferramenta converte arquivos Excel (.xlsx) em comandos SQL para importação direta em bancos de dados MySQL. É uma solução rápida para transformar suas planilhas em dados estruturados no seu banco de dados.</p>
-                        </div>
-                        
-                        <h4 class="text-primary mb-3">Como funciona</h4>
-                        <div class="step-card">
-                            <span class="step-number">1</span>
-                            <span><strong>Carregue sua planilha</strong> - Selecione um arquivo Excel (.xlsx) do seu computador</span>
-                        </div>
-                        <div class="step-card">
-                            <span class="step-number">2</span>
-                            <span><strong>Processamento automático</strong> - O sistema extrai os dados e gera os comandos SQL</span>
-                        </div>
-                        <div class="step-card">
-                            <span class="step-number">3</span>
-                            <span><strong>Download do SQL</strong> - Obtenha o script SQL pronto para importação no MySQL</span>
-                        </div>
-                        
-                        <h4 class="text-primary mt-4 mb-3">Recursos</h4>
-                        <ul class="features-list">
-                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Conversão rápida</strong> - Transforme suas planilhas em segundos</li>
-                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Suporta múltiplas abas</strong> - Processa todas as abas do Excel</li>
-                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Preserva tipos de dados</strong> - Detecção automática de tipos</li>
-                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Compatível com MySQL</strong> - Scripts otimizados para MySQL</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Formulário de Upload -->
-            <div class="col-lg-6">
+            <!-- Formulário de Upload - Agora ocupando toda a largura -->
+            <div class="col-12 section-card">
                 <div class="card">
                     <div class="card-header text-white">
                         <h3 class="mb-0"><i class="fas fa-file-upload me-2"></i>Carregar Arquivo</h3>
@@ -352,12 +381,76 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     </div>
                 </div>
             </div>
+
+            <!-- Informações do Projeto - Agora ocupando toda a largura -->
+            <div class="col-12 section-card">
+                <div class="card">
+                    <div class="card-header text-white">
+                        <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>Sobre o Conversor</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h4 class="text-primary mb-3">O que é isso?</h4>
+                            <p>Esta ferramenta converte arquivos Excel (.xlsx) em comandos SQL para importação direta em bancos de dados MySQL. É uma solução rápida para transformar suas planilhas em dados estruturados no seu banco de dados.</p>
+                        </div>
+                        
+                        <h4 class="text-primary mb-3">Como funciona</h4>
+                        <div class="step-card">
+                            <span class="step-number">1</span>
+                            <span><strong>Carregue sua planilha</strong> - Selecione um arquivo Excel (.xlsx) do seu computador</span>
+                        </div>
+                        <div class="step-card">
+                            <span class="step-number">2</span>
+                            <span><strong>Processamento automático</strong> - O sistema extrai os dados e gera os comandos SQL</span>
+                        </div>
+                        <div class="step-card">
+                            <span class="step-number">3</span>
+                            <span><strong>Download do SQL</strong> - Obtenha o script SQL pronto para importação no MySQL</span>
+                        </div>
+                        
+                        <h4 class="text-primary mt-4 mb-3">Recursos</h4>
+                        <ul class="features-list">
+                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Conversão rápida</strong> - Transforme suas planilhas em segundos</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Suporta múltiplas abas</strong> - Processa todas as abas do Excel</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Preserva tipos de dados</strong> - Detecção automática de tipos</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> <strong>Compatível com MySQL</strong> - Scripts otimizados para MySQL</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            
         </div>
     </div>
     
-    <footer class="text-white text-center py-4 mt-5">
+    <!-- Footer Atualizado -->
+    <footer>
         <div class="container">
-            <p class="mb-0">Conversor Excel para MySQL - Pedro Lazzaroni © <?php echo date('Y') ?> | Uma ferramenta para facilitar a importação de dados</p>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/favicon/favicon.png" alt="Logo">
+                    <span>Pedro Lazzaroni</span>
+                </div>
+                
+                <div class="footer-social">
+                    <a href="https://linkedin.com/in/pedrolazzaroni" class="social-link" target="_blank">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                    <a href="https://github.com/pedrolazzaroni" class="social-link" target="_blank">
+                        <i class="bi bi-github"></i>
+                    </a>
+                    <a href="https://www.instagram.com/pedro_lazzaroni" class="social-link" target="_blank">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="mailto:contato@pedrolazzaroni.com.br" class="social-link">
+                        <i class="bi bi-envelope"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; <?php echo date('Y'); ?> Pedro Lazzaroni. Todos os direitos reservados.</p>
+            </div>
         </div>
     </footer>
 
