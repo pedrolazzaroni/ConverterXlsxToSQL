@@ -105,7 +105,6 @@ O arquivo SQL gerado contém:
 ## Dicas de uso
 
 - Certifique-se de que a primeira linha do seu arquivo Excel contém os nomes das colunas
-- Evite nomes de colunas muito complexos ou com caracteres especiais não suportados em SQL
 - Para arquivos muito grandes, o processamento pode levar mais tempo
 - O nome da tabela SQL será derivado do nome do arquivo Excel
 - Todas as colunas são criadas como TEXT por padrão - você pode alterar manualmente o tipo de dados após a importação, se necessário
